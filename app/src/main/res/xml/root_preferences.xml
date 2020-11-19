@@ -1,0 +1,38 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <PreferenceCategory app:title="Colors">
+        <ListPreference
+            app:defaultValue="#FFEB3B"
+            app:entries="@array/colors"
+            app:entryValues="@array/colors_value"
+            app:key="hcolor"
+            app:title="Hours"
+            app:useSimpleSummaryProvider="true" />
+        <ListPreference
+            app:defaultValue="#FFFFFF"
+            app:entries="@array/colors"
+            app:entryValues="@array/colors_value"
+            app:key="mcolor"
+            app:title="Minutes"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Style">
+
+        <SwitchPreferenceCompat
+            app:key="hfill"
+            app:title="Fill hours" />
+
+        <SwitchPreferenceCompat
+            app:key="mfill"
+            app:title="Fill minutes" />
+
+    </PreferenceCategory>
+    <PreferenceCategory android:title="">
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
