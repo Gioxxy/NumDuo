@@ -107,13 +107,10 @@ class MyWatchFace : CanvasWatchFaceService(){
 
         private fun initializeWatchFace() {
             /* Set defaults for colors */
-
             mHoursPaintStyle = if (preferences.getBoolean("hfill", false)) Paint.Style.FILL else Paint.Style.STROKE
             mMinutesPaintStyle = if (preferences.getBoolean("mfill", false)) Paint.Style.FILL else Paint.Style.STROKE
             mHoursPaintColor = Color.parseColor(preferences.getString("hcolor", "0xFFEB3B")?.replace("0x", "#"))
             mMinutesPaintColor = Color.parseColor(preferences.getString("mcolor", "0xFFFFFF")?.replace("0x", "#"))
-
-
 
             mHoursPaint = Paint().apply {
                 color = mHoursPaintColor
@@ -169,15 +166,11 @@ class MyWatchFace : CanvasWatchFaceService(){
 
         private fun updateWatchHandStyle() {
             if (mAmbient) {
-
                 mHoursPaint.style = Paint.Style.STROKE
                 mMinutesPaint.style = Paint.Style.STROKE
-
             } else {
-
-                mHoursPaint.style = Paint.Style.FILL
-                mMinutesPaint.style = Paint.Style.STROKE
-
+                mHoursPaint.style = mHoursPaintStyle
+                mMinutesPaint.style = mMinutesPaintStyle
             }
         }
 
