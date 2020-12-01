@@ -13,12 +13,11 @@ import android.support.wearable.watchface.WatchFaceService
 import android.support.wearable.watchface.WatchFaceStyle
 import android.view.SurfaceHolder
 import androidx.preference.PreferenceManager
-import java.lang.NumberFormatException
-
+import java.lang.Math.pow
+import java.lang.Math.sqrt
 import java.lang.ref.WeakReference
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.TimeZone
+import java.util.*
 import java.util.logging.Level
 import java.util.logging.Logger
 
@@ -69,6 +68,7 @@ class MyWatchFace : CanvasWatchFaceService(){
         private var mCenterY: Float = 0F
         private var mWidth: Float = 0F
         private var mHeight: Float = 0F
+
 
         private lateinit var mHoursPaint: Paint
         private lateinit var mMinutesPaint: Paint
@@ -234,13 +234,42 @@ class MyWatchFace : CanvasWatchFaceService(){
         }
 
         private fun drawWatchFace(canvas: Canvas) {
-            var hours: String = SimpleDateFormat("HH").format(mCalendar.time)
-            var minutes = SimpleDateFormat("mm").format(mCalendar.time)
-            var bounds: Rect = Rect()
-            mHoursPaint.getTextBounds(hours, 0, hours.length, bounds);
-            canvas.drawText(hours, mWidth - 50, mCenterY - 10, mHoursPaint)
+            val hours: String = SimpleDateFormat("HH").format(mCalendar.time)
+            val minutes = SimpleDateFormat("mm").format(mCalendar.time)
 
-            canvas.drawText(minutes, mWidth - 50, mCenterY + 140, mMinutesPaint)
+            val paddingVertical = 0
+            val paddingHorizontal = 15
+            val safeAreaWidth = sqrt(2f * pow((mWidth).toDouble()/2, 2.0)).toFloat() - (paddingHorizontal*2)
+            val safeAreaHeight = sqrt(2f * pow((mHeight).toDouble()/2, 2.0)).toFloat() - (paddingVertical*2)
+            val safeAreaBottom = (mHeight - (mHeight - safeAreaHeight)/2) - paddingVertical
+            val safeAreaTop = ((mHeight - safeAreaHeight)/2) + paddingVertical
+            val safeAreaLeft = ((mWidth - safeAreaWidth)/2) - paddingHorizontal
+            val safeAreaRight = (mWidth - (mWidth - safeAreaWidth)/2) + paddingHorizontal
+
+            setTextSizeForWidth(mHoursPaint, safeAreaWidth, "00")
+            setTextSizeForWidth(mMinutesPaint, safeAreaWidth, "00")
+
+            canvas.drawText(hours, safeAreaRight, mCenterY - 7, mHoursPaint)
+            canvas.drawText(minutes, safeAreaRight, safeAreaBottom + 7, mMinutesPaint)
+        }
+
+        private fun setTextSizeForWidth(paint: Paint, desiredWidth: Float, text: String) {
+            // Pick a reasonably large value for the test. Larger values produce
+            // more accurate results, but may cause problems with hardware
+            // acceleration. But there are workarounds for that, too; refer to
+            // http://stackoverflow.com/questions/6253528/font-size-too-large-to-fit-in-cache
+            val testTextSize = 250f
+
+            // Get the bounds of the text, using our testTextSize.
+            paint.textSize = testTextSize
+            val bounds = Rect()
+            paint.getTextBounds(text, 0, text.length, bounds)
+
+            // Calculate the desired size as a proportion of our testTextSize.
+            var desiredTextSize = 0f
+            desiredTextSize = testTextSize * desiredWidth / bounds.width()
+            // Set the paint for that size.
+            paint.textSize = desiredTextSize
         }
 
         override fun onVisibilityChanged(visible: Boolean) {

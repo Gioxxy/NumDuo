@@ -3,16 +3,36 @@
     <string-array name="colors">
         <item>Red</item>
         <item>Blue</item>
+        <item>Indigo</item>
+        <item>Light Blue</item>
         <item>Green</item>
         <item>Yellow</item>
+        <item>Lime</item>
+        <item>Orange</item>
+        <item>Pink</item>
+        <item>Purple</item>
+        <item>Deep Purple</item>
+        <item>Brown</item>
+        <item>Blue Gray</item>
+        <item>Gray</item>
         <item>White</item>
     </string-array>
 
     <string-array name="colors_value">
         <item>#F44336</item>
-        <item>#2196F3</item>
+        <item>#448AFF</item>
+        <item>#536DFE</item>
+        <item>#40C4FF</item>
         <item>#69F0AE</item>
         <item>#FFEB3B</item>
+        <item>#EEFF41</item>
+        <item>#FF5722</item>
+        <item>#FF4081</item>
+        <item>#E040FB</item>
+        <item>#7C4DFF</item>
+        <item>#795548</item>
+        <item>#78909C</item>
+        <item>#E0E0E0</item>
         <item>#FFFFFF</item>
     </string-array>
 </resources>
