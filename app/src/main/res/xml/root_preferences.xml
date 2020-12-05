@@ -30,6 +30,10 @@
             app:key="mfill"
             app:title="Fill minutes" />
 
+        <SwitchPreferenceCompat
+            app:key="afill"
+            app:title="Fill in ambient" />
+
     </PreferenceCategory>
     <PreferenceCategory android:title="">
 

@@ -1,10 +1,7 @@
 package com.ioxxy.numduo
 
 import android.content.*
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.*
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
@@ -12,6 +9,7 @@ import android.support.wearable.watchface.CanvasWatchFaceService
 import android.support.wearable.watchface.WatchFaceService
 import android.support.wearable.watchface.WatchFaceStyle
 import android.view.SurfaceHolder
+import androidx.core.graphics.alpha
 import androidx.preference.PreferenceManager
 import java.lang.Math.pow
 import java.lang.Math.sqrt
@@ -72,6 +70,9 @@ class MyWatchFace : CanvasWatchFaceService(){
 
         private lateinit var mHoursPaint: Paint
         private lateinit var mMinutesPaint: Paint
+        private lateinit var mHoursAmbientPaint: Paint
+        private lateinit var mMinutesAmbientPaint: Paint
+        private var fillInAmbient: Boolean = false
         private var mHoursPaintStyle: Paint.Style = Paint.Style.STROKE
         private var mMinutesPaintStyle: Paint.Style = Paint.Style.STROKE
         private var mHoursPaintColor: Int = AppColor.YELLOW.hex
@@ -107,10 +108,11 @@ class MyWatchFace : CanvasWatchFaceService(){
 
         private fun initializeWatchFace() {
             /* Set defaults for colors */
-            mHoursPaintStyle = if (preferences.getBoolean("hfill", false)) Paint.Style.FILL else Paint.Style.STROKE
-            mMinutesPaintStyle = if (preferences.getBoolean("mfill", false)) Paint.Style.FILL else Paint.Style.STROKE
+            mHoursPaintStyle = if (preferences.getBoolean("hfill", false)) Paint.Style.FILL_AND_STROKE else Paint.Style.STROKE
+            mMinutesPaintStyle = if (preferences.getBoolean("mfill", false)) Paint.Style.FILL_AND_STROKE else Paint.Style.STROKE
             mHoursPaintColor = Color.parseColor(preferences.getString("hcolor", "0xFFEB3B")?.replace("0x", "#"))
             mMinutesPaintColor = Color.parseColor(preferences.getString("mcolor", "0xFFFFFF")?.replace("0x", "#"))
+            fillInAmbient = preferences.getBoolean("afill", false)
 
             mHoursPaint = Paint().apply {
                 color = mHoursPaintColor
@@ -123,6 +125,19 @@ class MyWatchFace : CanvasWatchFaceService(){
                 style = mHoursPaintStyle
             }
 
+            mHoursAmbientPaint = Paint().apply {
+                color = mHoursPaintColor
+                xfermode = PorterDuffXfermode(PorterDuff.Mode.ADD)
+                strokeWidth = 5f
+                isAntiAlias = true
+                strokeCap = Paint.Cap.ROUND
+                textSize = 190f
+                typeface = resources.getFont(R.font.myfont)
+                textAlign = Paint.Align.RIGHT
+                style = Paint.Style.FILL
+                alpha = 45
+            }
+
             mMinutesPaint = Paint().apply {
                 color = mMinutesPaintColor
                 strokeWidth = 5f
@@ -132,6 +147,19 @@ class MyWatchFace : CanvasWatchFaceService(){
                 typeface = resources.getFont(R.font.myfont)
                 textAlign = Paint.Align.RIGHT
                 style = mMinutesPaintStyle
+            }
+
+            mMinutesAmbientPaint = Paint().apply {
+                color = mMinutesPaintColor
+                xfermode = PorterDuffXfermode(PorterDuff.Mode.ADD)
+                strokeWidth = 5f
+                isAntiAlias = true
+                strokeCap = Paint.Cap.ROUND
+                textSize = 190f
+                typeface = resources.getFont(R.font.myfont)
+                textAlign = Paint.Align.RIGHT
+                style = Paint.Style.FILL
+                alpha = 45
             }
         }
 
@@ -249,6 +277,14 @@ class MyWatchFace : CanvasWatchFaceService(){
             setTextSizeForWidth(mHoursPaint, safeAreaWidth, "00")
             setTextSizeForWidth(mMinutesPaint, safeAreaWidth, "00")
 
+
+
+            if(mAmbient && fillInAmbient){
+                if(mHoursPaintStyle == Paint.Style.FILL_AND_STROKE)
+                    canvas.drawText(hours, safeAreaRight, mCenterY - 7, mHoursAmbientPaint)
+                if(mMinutesPaintStyle == Paint.Style.FILL_AND_STROKE)
+                    canvas.drawText(minutes, safeAreaRight, safeAreaBottom + 7, mMinutesAmbientPaint)
+            }
             canvas.drawText(hours, safeAreaRight, mCenterY - 7, mHoursPaint)
             canvas.drawText(minutes, safeAreaRight, safeAreaBottom + 7, mMinutesPaint)
         }
@@ -337,15 +373,21 @@ class MyWatchFace : CanvasWatchFaceService(){
 
         override fun onSharedPreferenceChanged(preferences: SharedPreferences?, key: String?) {
             if(preferences != null) {
-                mHoursPaintStyle = if (preferences.getBoolean("hfill", false)) Paint.Style.FILL else Paint.Style.STROKE
-                mMinutesPaintStyle = if (preferences.getBoolean("mfill", false)) Paint.Style.FILL else Paint.Style.STROKE
+                mHoursPaintStyle = if (preferences.getBoolean("hfill", false)) Paint.Style.FILL_AND_STROKE else Paint.Style.STROKE
+                mMinutesPaintStyle = if (preferences.getBoolean("mfill", false)) Paint.Style.FILL_AND_STROKE else Paint.Style.STROKE
                 mHoursPaintColor = Color.parseColor(preferences.getString("hcolor", "0xFFEB3B")?.replace("0x", "#"))
                 mMinutesPaintColor = Color.parseColor(preferences.getString("mcolor", "0xFFFFFF")?.replace("0x", "#"))
+                fillInAmbient = preferences.getBoolean("afill", false)
 
                 mHoursPaint.style = mHoursPaintStyle
                 mMinutesPaint.style = mMinutesPaintStyle
                 mHoursPaint.color = mHoursPaintColor
                 mMinutesPaint.color = mMinutesPaintColor
+
+                mHoursAmbientPaint.color = mHoursPaintColor
+                mHoursAmbientPaint.alpha = 45
+                mMinutesAmbientPaint.color= mMinutesPaintColor
+                mMinutesAmbientPaint.alpha = 45
 
                 invalidate()
             }
